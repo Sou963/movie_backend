@@ -28,9 +28,12 @@ const registerUser = async (req, res) => {
       createdAt: new Date(),
     });
 
-    res.json({ message: "Register success" });
+    res.status(201).json({
+      success: true,
+      message: "Registration successful! Please login.",
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -58,8 +61,9 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Wrong password" });
     }
 
-    res.json({
+    res.status(200).json({
       success: true,
+      message: "Login successful!",
       user: {
         id: user._id,
         name: user.name,
@@ -67,7 +71,7 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
