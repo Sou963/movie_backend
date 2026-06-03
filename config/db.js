@@ -1,25 +1,28 @@
 const { MongoClient } = require("mongodb");
 
-const client = new MongoClient(process.env.MONGODB_URI);
+const uri = process.env.MONGO_URI;
 
-let db;
+let client;
+let clientPromise;
 
-const connectDB = async () => {
-  try {
-    await client.connect();
-    db = client.db("movieapp");
-    console.log("MongoDB Connected");
-  } catch (err) {
-    console.error("DB Error:", err.message);
-    throw new Error("Failed to connect to MongoDB: " + err.message);
+if (!uri) {
+  throw new Error("Please add MONGO_URI in .env");
+}
+
+if (process.env.NODE_ENV === "development") {
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(uri);
+    global._mongoClientPromise = client.connect();
   }
-};
+  clientPromise = global._mongoClientPromise;
+} else {
+  client = new MongoClient(uri);
+  clientPromise = client.connect();
+}
 
-const getDB = () => {
-  if (!db) {
-    throw new Error("Database not connected yet");
-  }
-  return db;
-};
+async function connectDB() {
+  const client = await clientPromise;
+  return client.db("movieApp"); // change DB name if needed
+}
 
-module.exports = { connectDB, getDB };
+module.exports = { connectDB };

@@ -1,5 +1,8 @@
-const { getDB } = require("../config/db");
+const { connectDB } = require("../config/db");
 
-const users = () => getDB().collection("users");
+const users = async () => {
+  const db = await connectDB();
+  return db.collection("users");
+};
 
 module.exports = users;
